@@ -19,6 +19,10 @@ model Users {
   hash      String // for password hash
   firstname String?
   lastname  String?
+
+  bookmarks Bookmark[]
+
+  @@map("user")
 }
 
 model Bookmark {
@@ -26,7 +30,13 @@ model Bookmark {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  //creating associations (Many to one)
+  userId String
+  user   Users  @relation(fields: [userId], references: [id])
+
   title       String
   description String?
   link        String?
+
+  @@map("bookmarks")
 }
