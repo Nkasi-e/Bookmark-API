@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Users {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   creatAt   DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -22,7 +22,7 @@ model Users {
 }
 
 model Bookmark {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
