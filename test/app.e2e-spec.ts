@@ -5,7 +5,10 @@ import { ValidationPipe, INestApplication } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { CreateAuthDto } from 'src/auth/dto';
 import { EditUserDto } from 'src/user/dto';
-import { CreateBookmarkDto } from './../src/bookmark/dto/bookmark.dto';
+import {
+  CreateBookmarkDto,
+  EditBookmarkDto,
+} from './../src/bookmark/dto/bookmark.dto';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -220,16 +223,68 @@ describe('App e2e', () => {
           })
           .withBody(dto)
           .expectStatus(201)
+          .stores('bookmarkId', 'id');
+      });
+    });
+
+    describe('Get BookMark', () => {
+      it('should get bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmark')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(200);
+      });
+    });
+
+    describe('Get BookMark By id', () => {
+      it('should get bookmarks by id', () => {
+        return pactum
+          .spec()
+          .get('/bookmark/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(200)
           .inspect();
       });
     });
 
-    describe('Get BookMark', () => {});
+    describe('Edit BookMark By id', () => {
+      const dto: EditBookmarkDto = {
+        title: 'Avatar periodic',
+        description: 'The last airbender to wakanda',
+        link: 'http://youtube.com/watch?v=avatar?hhe',
+      };
+      it('should edit bookmark by Id', () => {
+        return pactum
+          .spec()
+          .patch('/bookmark/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .withBody(dto)
+          .expectStatus(200)
+          .inspect();
+      });
+    });
 
-    describe('Get BookMark By id', () => {});
-
-    describe('Edit BookMark By id', () => {});
-
-    describe('Delete BookMark By id', () => {});
+    describe('Delete BookMark By id', () => {
+      it('should delete bookmark by Id', () => {
+        return pactum
+          .spec()
+          .delete('/bookmark/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(204)
+          .inspect();
+      });
+    });
   });
 });
