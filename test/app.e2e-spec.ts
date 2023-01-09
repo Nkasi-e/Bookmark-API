@@ -5,6 +5,7 @@ import { ValidationPipe, INestApplication } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { CreateAuthDto } from 'src/auth/dto';
 import { EditUserDto } from 'src/user/dto';
+import { CreateBookmarkDto } from './../src/bookmark/dto/bookmark.dto';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -183,20 +184,52 @@ describe('App e2e', () => {
             Authorization: 'Bearer $S{userAt}', // accessing the token with pactum syntax
           })
           .withBody(dto)
-          .expectStatus(200);
+          .expectStatus(200)
+          .expectBodyContains(dto.firstname)
+          .expectBodyContains(dto.lastname);
       });
     });
   });
 
   describe('Bookmarks', () => {
-    describe('Create BookMark', () => {});
+    describe('Get empty BookMark', () => {
+      it('should get bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmark')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(200)
+          .expectBody([]);
+      });
+    });
+
+    describe('Create BookMark', () => {
+      const dto: CreateBookmarkDto = {
+        title: 'Avatar bend',
+        description: 'The last airbender',
+        link: 'http://youtube.com/watch?v=avatar',
+      };
+      it('should create bookmark', () => {
+        return pactum
+          .spec()
+          .post('/bookmark')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .withBody(dto)
+          .expectStatus(201)
+          .inspect();
+      });
+    });
 
     describe('Get BookMark', () => {});
 
     describe('Get BookMark By id', () => {});
 
-    describe('Edit BookMark', () => {});
+    describe('Edit BookMark By id', () => {});
 
-    describe('Delete BookMark', () => {});
+    describe('Delete BookMark By id', () => {});
   });
 });
